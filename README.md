@@ -29,4 +29,4 @@ A continuación, se listan las librerías externas agregadas y la justificación
 ## 📜 Instalación y uso
 1️⃣ Clonar el repositorio:
 ```sh
-git clone https://github.com/tuusuario/tu-repo.git
+git clone https://github.com/AxelElHilon/hypegear-ElHilon.git
