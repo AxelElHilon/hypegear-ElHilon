@@ -6,8 +6,9 @@ import { Link } from "react-router-dom";
 
 const Checkout = () => {
   const { cart, totalPrice, clearCart } = useCart();
-  const [buyer, setBuyer] = useState({ name: "", email: "", phone: "" });
+  const [buyer, setBuyer] = useState({ name: "", email: "", confirmEmail: "", phone: "" });
   const [orderId, setOrderId] = useState(null);
+  const [error, setError] = useState("");
 
   const handleChange = (e) => {
     setBuyer({ ...buyer, [e.target.name]: e.target.value });
@@ -15,22 +16,29 @@ const Checkout = () => {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-
+    
+    // Verificar si el carrito está vacío
     if (cart.length === 0) {
       alert("El carrito está vacío. Agrega productos antes de finalizar la compra.");
       return;
     }
 
+    // Validación de email doble
+    if (buyer.email !== buyer.confirmEmail) {
+      setError("Los correos electrónicos no coinciden.");
+      return;
+    }
+
     const order = {
-      buyer,
+      buyer: { name: buyer.name, email: buyer.email, phone: buyer.phone },
       items: cart.map(item => ({
         id: item.id,
         name: item.name,
         price: item.price,
         quantity: item.quantity,
       })),
-      total: totalPrice, // ✅ Sin paréntesis
-      date: Timestamp.fromDate(new Date()), // ✅ Formato recomendado por Firebase
+      total: totalPrice, 
+      date: Timestamp.fromDate(new Date()), 
     };
 
     try {
@@ -60,6 +68,11 @@ const Checkout = () => {
           <div className="mb-3">
             <label className="form-label">Email</label>
             <input type="email" name="email" className="form-control" value={buyer.email} onChange={handleChange} required />
+          </div>
+          <div className="mb-3">
+            <label className="form-label">Confirmar Email</label>
+            <input type="email" name="confirmEmail" className="form-control" value={buyer.confirmEmail} onChange={handleChange} required />
+            {error && <p className="text-danger mt-1">{error}</p>}
           </div>
           <div className="mb-3">
             <label className="form-label">Teléfono</label>

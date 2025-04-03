@@ -1,26 +1,46 @@
 import React, { useEffect, useState } from "react";
 import { useParams, Link } from "react-router-dom";
-import { useCart } from "../context/CartContext";
-import ItemDetail from "./ItemDetail"; // Importamos ItemDetail
-
-const productos = [
-  { id: 1, name: "Remera Negra", category: "remeras", price: 5000, img: "/images/remera.png", description: "Remera negra de algodón" },
-  { id: 2, name: "Gorra Negra", category: "gorras", price: 3000, img: "/images/gorra2.png", description: "Gorra negra ajustable" },
-  { id: 3, name: "Zapatillas Blancas", category: "zapatillas", price: 10000, img: "/images/zapatillas2.png", description: "Zapatillas blancas deportivas" },
-  { id: 4, name: "Remera Blanca", category: "remeras", price: 5000, img:"/images/remera2.png", description: "Remera blanca básica" },
-  { id: 5, name: "Gorra Beige", category: "gorras", price: 3000, img: "/images/gorra.png", description: "Gorra beige clásica" },
-  { id: 6, name: "Zapatillas Negras", category: "zapatillas", price: 12000, img: "/images/zapatillas.png", description: "Zapatillas negras urbanas" },
-];
-
+import { doc, getDoc } from "firebase/firestore";
+import { db } from "../firebase/config";
+import ItemDetail from "./ItemDetail";
 
 const ItemDetailContainer = () => {
   const { id } = useParams();
   const [product, setProduct] = useState(null);
+  const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    const foundProduct = productos.find((p) => p.id === parseInt(id));
-    setProduct(foundProduct);
+    const fetchProduct = async () => {
+      setLoading(true);
+      try {
+        const docRef = doc(db, "items", id);
+        const docSnap = await getDoc(docRef);
+
+        if (docSnap.exists()) {
+          let productData = docSnap.data();
+
+          // Unificar `image` y `img` para evitar errores de carga de imágenes
+          if (productData.image && !productData.img) {
+            productData.img = productData.image;
+          }
+
+          console.log("Producto encontrado:", productData);
+          setProduct({ id: docSnap.id, ...productData });
+        } else {
+          console.warn("Producto no encontrado en Firebase.");
+          setProduct(null);
+        }
+      } catch (error) {
+        console.error("Error al obtener el producto:", error);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchProduct();
   }, [id]);
+
+  if (loading) return <p>Cargando producto...</p>;
 
   if (!product) {
     return (
