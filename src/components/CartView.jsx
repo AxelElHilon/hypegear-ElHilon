@@ -14,17 +14,26 @@ const CartView = () => {
       ) : (
         <>
           <ul className="list-group mb-3">
-            {cart.map((item) => (
-              <li key={item.id} className="list-group-item d-flex justify-content-between align-items-center">
-                <div>
-                  <h5>{item.name}</h5>
-                  <p>Cantidad: {item.quantity} - Precio: ${item.price.toFixed(2)} - Subtotal: ${(item.price * item.quantity).toFixed(2)}</p>
-                </div>
-                <button className="btn btn-danger" onClick={() => removeFromCart(item.id)}>
-                  Eliminar
-                </button>
-              </li>
-            ))}
+            {cart.map((item) => {
+              const price = parseFloat(item.price);
+              const subtotal = price * item.quantity;
+
+              return (
+                <li key={item.id} className="list-group-item d-flex justify-content-between align-items-center">
+                  <div>
+                    <h5>{item.name}</h5>
+                    <p>
+                      Cantidad: {item.quantity} - 
+                      Precio: ${price.toFixed(2)} - 
+                      Subtotal: ${subtotal.toFixed(2)}
+                    </p>
+                  </div>
+                  <button className="btn btn-danger" onClick={() => removeFromCart(item.id)}>
+                    Eliminar
+                  </button>
+                </li>
+              );
+            })}
           </ul>
           <h4>Total: ${totalPrice.toFixed(2)}</h4>
           <div className="d-flex gap-2">
