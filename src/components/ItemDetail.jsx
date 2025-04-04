@@ -2,9 +2,9 @@ import React, { useState } from "react";
 import { useCart } from "../context/CartContext";
 import { useWishlist } from "../context/WishlistContext";
 import ItemQuantitySelector from "./ItemQuantitySelector";
+import { Link } from "react-router-dom";
 
 const ItemDetail = ({ product }) => {
-  console.log("Renderizando ItemDetail con producto:", product);
   const { addToCart } = useCart();
   const { wishlist, addToWishlist, removeFromWishlist } = useWishlist();
   const [quantity, setQuantity] = useState(1);
@@ -25,15 +25,12 @@ const ItemDetail = ({ product }) => {
         <p className="mt-3">{product.description}</p>
         <h4 className="text-success">${product.price}</h4>
 
-        {/* Selector de cantidad */}
         <ItemQuantitySelector stock={10} onQuantityChange={setQuantity} />
 
-        {/* Botón para agregar al carrito */}
         <button className="btn btn-primary mt-3" onClick={handleAddToCart}>
           Agregar {quantity} al carrito
         </button>
         
-        {/* Botón para agregar o quitar de la wishlist */}
         <button 
           className={`btn mt-3 ${isInWishlist ? 'btn-danger' : 'btn-outline-secondary'}`} 
           onClick={() => isInWishlist ? removeFromWishlist(product.id) : addToWishlist(product)}
@@ -42,22 +39,26 @@ const ItemDetail = ({ product }) => {
         </button>
       </div>
 
-      {/* Modal de compra exitosa */}
+      {/* Modal de confirmación */}
       {showModal && (
-        <div className="modal fade show d-block" tabIndex="-1" role="dialog">
-          <div className="modal-dialog" role="document">
-            <div className="modal-content">
-              <div className="modal-header">
-                <h5 className="modal-title">🎉 ¡Compra Exitosa! 🎉</h5>
-                <button type="button" className="close" onClick={() => setShowModal(false)}>
-                  <span>&times;</span>
+        <div className="modal fade show d-block" tabIndex="-1" role="dialog" style={{ backgroundColor: 'rgba(0, 0, 0, 0.5)' }}>
+          <div className="modal-dialog modal-dialog-centered" role="document">
+            <div className="modal-content border-success shadow">
+              <div className="modal-header bg-success text-white">
+                <h5 className="modal-title">🛒 ¡Producto agregado!</h5>
+                <button type="button" className="btn-close btn-close-white" onClick={() => setShowModal(false)}></button>
+              </div>
+              <div className="modal-body text-center">
+                <h5 className="mb-3">🎉 Agregaste <strong>{quantity}</strong> unidad{quantity > 1 && 'es'} de <strong>{product.name}</strong> al carrito.</h5>
+                <span className="fs-2">🔥🙌✨</span>
+              </div>
+              <div className="modal-footer d-flex justify-content-between">
+                <Link to="/cart" className="btn btn-outline-primary" onClick={() => setShowModal(false)}>
+                  Ver carrito
+                </Link>
+                <button className="btn btn-success" onClick={() => setShowModal(false)}>
+                  Seguir comprando
                 </button>
-              </div>
-              <div className="modal-body">
-                <p> ¡Producto agregado al carrito con éxito! 🎉🛒 </p>
-              </div>
-              <div className="modal-footer">
-                <button className="btn btn-success" onClick={() => setShowModal(false)}>Aceptar</button>
               </div>
             </div>
           </div>
